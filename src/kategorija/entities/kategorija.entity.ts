@@ -9,6 +9,9 @@ export class Kategorija {
     @Column({ type: 'timestamptz', nullable: false, default: () => "CURRENT_TIMESTAMP" })
     public dateCreated!: Date;
 
+    @Column({ type: 'timestamptz', nullable: false, default: () => "CURRENT_TIMESTAMP" })
+    public dateUpdated!: Date;
+
     @Column({ type: 'text', nullable: false })
     public name!: string;
 

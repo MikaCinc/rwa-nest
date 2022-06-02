@@ -40,7 +40,7 @@ export class TypeOrmConfigService implements TypeOrmOptionsFactory {
             //! @important SAMO TRUE PRILIKOM TESTIRANJA, NIKAD U PRODUKCIJI
             //! AUTOMATSKI PRAVI NOVU MIGRACIJU PRILIKOM REKOMPAJLIRANJA
             // synchronize: this.config.get<string>('MODE') === 'DEV'
-            synchronize: false
+            synchronize: true
         };
     };
 };

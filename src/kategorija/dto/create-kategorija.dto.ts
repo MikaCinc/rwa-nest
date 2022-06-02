@@ -1,1 +1,3 @@
-export class CreateKategorijaDto {}
+export class CreateKategorijaDto {
+    name: string;
+}
