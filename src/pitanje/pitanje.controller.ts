@@ -71,9 +71,9 @@ export class PitanjeController {
       };
   
       try {
-        let kategorija: Pitanje = await this.pitanjeService.update(+id, updatePitanjeDto);
+        let pitanje: Pitanje = await this.pitanjeService.update(+id, updatePitanjeDto);
         response.success = true;
-        response.data = kategorija;
+        response.data = pitanje;
       } catch (err) {
         response.message = err.message;
       }

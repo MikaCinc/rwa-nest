@@ -33,11 +33,14 @@ export class PitanjeService {
     if (!pitanje || !pitanje.id) {
       throw new Error('Pitanje with that ID not found');
     }
-    const { text } = updatePitanjeDto;
+    const { text, isCorrect } = updatePitanjeDto;
+    console.log(updatePitanjeDto);
+
     if (!text) {
       throw new Error('Ime kategorije je obavezno');
     }
-    pitanje.text = updatePitanjeDto.text;
+    pitanje.text = text;
+    pitanje.isCorrect = isCorrect;
     pitanje.dateUpdated = new Date();
     let result: Pitanje = await this.pitRepository.save(pitanje);
     return result;
