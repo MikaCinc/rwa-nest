@@ -1,1 +1,4 @@
-export class CreatePitanjeDto {}
+export class CreatePitanjeDto {
+    text: string;
+    isCorrect: boolean;
+}
