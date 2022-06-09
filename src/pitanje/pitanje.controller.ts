@@ -7,7 +7,7 @@ import { Pitanje } from './entities/pitanje.entity';
 
 @Controller('pitanje')
 export class PitanjeController {
-  constructor(private readonly pitanjeService: PitanjeService) {}
+  constructor(private readonly pitanjeService: PitanjeService) { }
 
   @Post()
   async create(@Body() createPitanjeDto: CreatePitanjeDto) {
@@ -35,9 +35,27 @@ export class PitanjeController {
     };
 
     try {
-      let kategorije: Pitanje[] = await this.pitanjeService.findAll();
+      let pitanja: Pitanje[] = await this.pitanjeService.findAll();
       response.success = true;
-      response.data = kategorije;
+      response.data = pitanja;
+    } catch (err) {
+      response.message = err.message;
+    }
+
+    return response;
+  }
+
+  @Get('/kategorija/:id')
+  async findAllByCategory(@Param('id') id: string) {
+    let response: ServerResponse<Pitanje[]> = {
+      success: false,
+      data: null
+    };
+
+    try {
+      let pitanja: Pitanje[] = await this.pitanjeService.findAllByCategory(+id);
+      response.success = true;
+      response.data = pitanja;
     } catch (err) {
       response.message = err.message;
     }
@@ -53,9 +71,9 @@ export class PitanjeController {
     };
 
     try {
-      let kategorije: Pitanje = await this.pitanjeService.findOne(+id);
+      let pitanja: Pitanje = await this.pitanjeService.findOne(+id);
       response.success = true;
-      response.data = kategorije;
+      response.data = pitanja;
     } catch (err) {
       response.message = err.message;
     }
@@ -67,18 +85,18 @@ export class PitanjeController {
   async update(@Param('id') id: string, @Body() updatePitanjeDto: UpdatePitanjeDto) {
     let response: ServerResponse<Pitanje> = {
       success: false,
-        data: null
-      };
-  
-      try {
-        let pitanje: Pitanje = await this.pitanjeService.update(+id, updatePitanjeDto);
-        response.success = true;
-        response.data = pitanje;
-      } catch (err) {
-        response.message = err.message;
-      }
-  
-      return response;  
+      data: null
+    };
+
+    try {
+      let pitanje: Pitanje = await this.pitanjeService.update(+id, updatePitanjeDto);
+      response.success = true;
+      response.data = pitanje;
+    } catch (err) {
+      response.message = err.message;
+    }
+
+    return response;
   }
 
   @Delete(':id')

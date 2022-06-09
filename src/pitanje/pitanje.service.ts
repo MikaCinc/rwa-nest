@@ -4,6 +4,7 @@ import { UpdatePitanjeDto } from './dto/update-pitanje.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { DeleteResult, Repository } from 'typeorm';
 import { Pitanje } from './entities/pitanje.entity';
+import { getAllQuestionsByCategory } from './pitanje.queries';
 
 @Injectable()
 export class PitanjeService {
@@ -16,8 +17,16 @@ export class PitanjeService {
   }
 
   async findAll() {
-    let kategorije = await this.pitRepository.find();
-    return kategorije;
+    let pitanja = await this.pitRepository.find();
+    return pitanja;
+  }
+
+  async findAllByCategory(categoryId: number) {
+    // get all pitanja which contain categoryId
+    let pitanja = await this.pitRepository
+      .query(getAllQuestionsByCategory, [[categoryId]]);
+    // let pitanja = await this.pitRepository.find();
+    return pitanja;
   }
 
   async findOne(id: number) {
