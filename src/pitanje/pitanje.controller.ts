@@ -2,7 +2,7 @@ import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/commo
 import { PitanjeService } from './pitanje.service';
 import { CreatePitanjeDto } from './dto/create-pitanje.dto';
 import { UpdatePitanjeDto } from './dto/update-pitanje.dto';
-import { ServerResponse } from 'src/interfaces';
+import { IPitanje, ServerResponse } from 'src/interfaces';
 import { Pitanje } from './entities/pitanje.entity';
 
 @Controller('pitanje')
@@ -11,13 +11,13 @@ export class PitanjeController {
 
   @Post()
   async create(@Body() createPitanjeDto: CreatePitanjeDto) {
-    let response: ServerResponse<Pitanje> = {
+    let response: ServerResponse<IPitanje> = {
       success: false,
       data: null
     };
 
     try {
-      let newPit: Pitanje = await this.pitanjeService.create(createPitanjeDto);
+      let newPit: IPitanje = await this.pitanjeService.create(createPitanjeDto);
       response.success = true;
       response.data = newPit;
     } catch (err) {

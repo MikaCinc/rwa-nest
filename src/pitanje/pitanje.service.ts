@@ -2,9 +2,11 @@ import { Injectable } from '@nestjs/common';
 import { CreatePitanjeDto } from './dto/create-pitanje.dto';
 import { UpdatePitanjeDto } from './dto/update-pitanje.dto';
 import { InjectRepository } from '@nestjs/typeorm';
-import { DeleteResult, Repository } from 'typeorm';
+import { DeleteResult, InsertResult, Repository } from 'typeorm';
 import { Pitanje } from './entities/pitanje.entity';
-import { getAllQuestionsByCategory } from './pitanje.queries';
+import { getAllQuestionsByCategory, insertTestTagsQuery, selectAllCategoryIDsViaPitanjeID } from './pitanje.queries';
+
+type KategorijaId = { id: number }
 
 @Injectable()
 export class PitanjeService {
@@ -12,8 +14,22 @@ export class PitanjeService {
     @InjectRepository(Pitanje) private pitRepository: Repository<Pitanje>
   ) { }
 
-  create(createPitanjeDto: CreatePitanjeDto) {
-    return this.pitRepository.save(createPitanjeDto);
+  async create(createPitanjeDto: CreatePitanjeDto) {
+    let finalPitanje = new Pitanje();
+    finalPitanje.text = createPitanjeDto.text;
+    finalPitanje.isCorrect = createPitanjeDto.isCorrect;
+    finalPitanje.dateCreated = new Date();
+    finalPitanje.dateUpdated = new Date();
+    finalPitanje.categories = [];
+    let result = await this.pitRepository.save(finalPitanje);
+    let ubaceneKategorije: InsertResult = await this.pitRepository.query(insertTestTagsQuery, [result.id, createPitanjeDto.categories]);
+    let fetchedCategoriesAfterChange: any[] = await this.pitRepository.query(selectAllCategoryIDsViaPitanjeID, [result.id]);
+    let finalPitanjeCategories: number[] = fetchedCategoriesAfterChange.map((tagId: KategorijaId) => tagId.id);
+    console.log(result, finalPitanjeCategories);
+    return {
+      ...result,
+      categories: finalPitanjeCategories
+    }
   }
 
   async findAll() {
@@ -61,3 +77,4 @@ export class PitanjeService {
     return !!result.affected;
   }
 }
+
