@@ -4,7 +4,7 @@ import { UpdatePitanjeDto } from './dto/update-pitanje.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { DeleteResult, InsertResult, Repository } from 'typeorm';
 import { Pitanje } from './entities/pitanje.entity';
-import { getAllQuestionsByCategory, insertTestTagsQuery, selectAllCategoryIDsViaPitanjeID } from './pitanje.queries';
+import { getAllQuestionsByCategory, insertTestTagsQuery, selectAllCategoryIDsViaPitanjeID, deleteAllCategoriesQuery } from './pitanje.queries';
 
 type KategorijaId = { id: number }
 
@@ -22,13 +22,16 @@ export class PitanjeService {
     finalPitanje.dateUpdated = new Date();
     finalPitanje.categories = [];
     let result = await this.pitRepository.save(finalPitanje);
-    let ubaceneKategorije: InsertResult = await this.pitRepository.query(insertTestTagsQuery, [result.id, createPitanjeDto.categories]);
-    let fetchedCategoriesAfterChange: any[] = await this.pitRepository.query(selectAllCategoryIDsViaPitanjeID, [result.id]);
-    let finalPitanjeCategories: number[] = fetchedCategoriesAfterChange.map((tagId: KategorijaId) => tagId.id);
-    console.log(result, finalPitanjeCategories);
+    let finalPitanjeCategories: number[] = [];
+    if (createPitanjeDto.categories && createPitanjeDto.categories.length > 0) {
+      let ubaceneKategorije: InsertResult = await this.pitRepository.query(insertTestTagsQuery, [result.id, createPitanjeDto.categories]);
+      let fetchedCategoriesAfterChange: any[] = await this.pitRepository.query(selectAllCategoryIDsViaPitanjeID, [result.id]);
+      finalPitanjeCategories = fetchedCategoriesAfterChange.map((tagId: KategorijaId) => tagId.id);
+      console.log(result, finalPitanjeCategories);
+    }
     return {
       ...result,
-      categories: finalPitanjeCategories
+      categories: finalPitanjeCategories || []
     }
   }
 
@@ -68,7 +71,24 @@ export class PitanjeService {
     pitanje.isCorrect = isCorrect;
     pitanje.dateUpdated = new Date();
     let result: Pitanje = await this.pitRepository.save(pitanje);
-    return result;
+
+    let deleteResult: DeleteResult;
+    let insertResult: InsertResult;
+    let finalPitanjeCategories: number[] = [];
+    // brisemo sve kategorije pitanja
+    deleteResult = await this.pitRepository.query(deleteAllCategoriesQuery, [result.id]);
+    if (updatePitanjeDto.categories && updatePitanjeDto.categories.length > 0) {
+      // ubacujemo nove kategorije
+      insertResult = await this.pitRepository.query(insertTestTagsQuery, [result.id, updatePitanjeDto.categories]);
+    }
+
+    let fetchedCategoriesAfterChange: any[] = await this.pitRepository.query(selectAllCategoryIDsViaPitanjeID, [result.id]);
+    finalPitanjeCategories = fetchedCategoriesAfterChange.map((tagId: KategorijaId) => tagId.id);
+
+    return {
+      ...result,
+      categories: finalPitanjeCategories || []
+    }
     /* return this.pitRepository.update(id, { ...updatePitanjeDto, dateUpdated: new Date() }); */
   }
 

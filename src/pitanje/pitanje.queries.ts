@@ -25,8 +25,14 @@ const insertTestTagsQuery: string = `
 // query koji vraca sve kategorije jednog pitanja
 const selectAllCategoryIDsViaPitanjeID: string = `SELECT "kategorijaId" as "id" FROM "pitanjeKategorije" WHERE "pitanjeKategorije"."pitanjeId" = $1;`;
 
+const deleteAllCategoriesQuery: string = `
+    DELETE
+    FROM "pitanjeKategorije"
+    WHERE "pitanjeKategorije"."pitanjeId" = $1;`;
+
 export {
     getAllQuestionsByCategory,
     insertTestTagsQuery,
-    selectAllCategoryIDsViaPitanjeID
+    selectAllCategoryIDsViaPitanjeID,
+    deleteAllCategoriesQuery
 }

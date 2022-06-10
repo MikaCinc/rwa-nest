@@ -83,13 +83,13 @@ export class PitanjeController {
 
   @Patch(':id')
   async update(@Param('id') id: string, @Body() updatePitanjeDto: UpdatePitanjeDto) {
-    let response: ServerResponse<Pitanje> = {
+    let response: ServerResponse<IPitanje> = {
       success: false,
       data: null
     };
 
     try {
-      let pitanje: Pitanje = await this.pitanjeService.update(+id, updatePitanjeDto);
+      let pitanje: IPitanje = await this.pitanjeService.update(+id, updatePitanjeDto);
       response.success = true;
       response.data = pitanje;
     } catch (err) {
