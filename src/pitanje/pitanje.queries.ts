@@ -1,3 +1,14 @@
+const getAllQuestionsWithCategories: string = `
+    SELECT
+    pitanje.id,
+    pitanje.text,
+    pitanje."isCorrect",
+    pitanje."dateCreated",
+    pitanje."dateUpdated",
+    (SELECT ARRAY(SELECT "kategorijaId" FROM "pitanjeKategorije" WHERE "pitanjeKategorije"."pitanjeId" = "pitanje"."id")) AS "categories"
+
+    FROM pitanje;`;
+
 const getAllQuestionsByCategory: string = `
 SELECT * FROM (
     SELECT
@@ -6,11 +17,11 @@ SELECT * FROM (
     pitanje."isCorrect",
     pitanje."dateCreated",
     pitanje."dateUpdated",
-    (SELECT ARRAY(SELECT "kategorijaId" FROM "pitanjeKategorije" WHERE "pitanjeKategorije"."pitanjeId" = "pitanje"."id")) AS "kategorije"
+    (SELECT ARRAY(SELECT "kategorijaId" FROM "pitanjeKategorije" WHERE "pitanjeKategorije"."pitanjeId" = "pitanje"."id")) AS "categories"
 
     FROM pitanje
 ) AS "pitanjeWrapper"
-WHERE "pitanjeWrapper"."kategorije" @> COALESCE($1::integer[])`;
+WHERE "pitanjeWrapper"."categories" @> COALESCE($1::integer[]);`;
 
 const insertTestTagsQuery: string = `
     INSERT INTO "pitanjeKategorije" ("pitanjeId", "kategorijaId")
@@ -31,6 +42,7 @@ const deleteAllCategoriesQuery: string = `
     WHERE "pitanjeKategorije"."pitanjeId" = $1;`;
 
 export {
+    getAllQuestionsWithCategories,
     getAllQuestionsByCategory,
     insertTestTagsQuery,
     selectAllCategoryIDsViaPitanjeID,

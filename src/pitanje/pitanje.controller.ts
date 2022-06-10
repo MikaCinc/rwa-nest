@@ -29,13 +29,13 @@ export class PitanjeController {
 
   @Get()
   async findAll() {
-    let response: ServerResponse<Pitanje[]> = {
+    let response: ServerResponse<IPitanje[]> = {
       success: false,
       data: null
     };
 
     try {
-      let pitanja: Pitanje[] = await this.pitanjeService.findAll();
+      let pitanja: IPitanje[] = await this.pitanjeService.findAll();
       response.success = true;
       response.data = pitanja;
     } catch (err) {
