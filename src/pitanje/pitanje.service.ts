@@ -49,11 +49,18 @@ export class PitanjeService {
   }
 
   async findOne(id: number) {
+    // let pitanje = await this.pitRepository.findOneBy({ id });
+    const categoriesRaw = await this.pitRepository.query(selectAllCategoryIDsViaPitanjeID, [id]);
+    const categories = categoriesRaw.map((cat) => cat.id);
+    console.log(categories);
     let pitanje = await this.pitRepository.findOneBy({ id });
     if (!pitanje || !pitanje.id) {
       throw new Error('Pitanje with that ID not found');
     }
-    return pitanje;
+    return {
+      ...pitanje,
+      categories
+    };
   }
 
   async update(id: number, updatePitanjeDto: UpdatePitanjeDto) {
