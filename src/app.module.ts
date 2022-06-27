@@ -8,6 +8,8 @@ import { TypeOrmConfigService } from './typeorm/typeorm.service';
 import { getEnvPath } from './common/helpers/env.helper';
 import { KategorijaModule } from './kategorija/kategorija.module';
 import { DataSource } from 'typeorm';
+import { AuthModule } from './auth/auth.module';
+import { UsersModule } from './users/users.module';
 
 const envFilePath: string = getEnvPath(`${__dirname}/common/envs`);
 
@@ -25,7 +27,9 @@ const envFilePath: string = getEnvPath(`${__dirname}/common/envs`);
       }, */
     }),
     PitanjeModule,
-    KategorijaModule],
+    KategorijaModule,
+    AuthModule,
+    UsersModule],
   controllers: [AppController],
   providers: [AppService],
 })
