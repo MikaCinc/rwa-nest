@@ -23,11 +23,8 @@ export class AuthService {
         console.log('login user', user);
         const payload = { username: user.username, sub: user.id };
         return {
-            success: true,
-            data: {
-                user,
-                access_token: this.jwtService.sign(payload),
-            }
+            user,
+            access_token: this.jwtService.sign(payload),
         };
     }
 }
