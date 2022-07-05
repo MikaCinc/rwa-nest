@@ -1,7 +1,9 @@
 
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { UserTypeEnum } from 'src/enums';
 import { Repository } from 'typeorm';
+import { CreateUserDto } from './dto/create-user-dto';
 import { User } from './entities/user.entity';
 
 @Injectable()
@@ -29,5 +31,16 @@ export class UsersService {
         }
 
         return user;
+    }
+
+    createUser(createUserDto: CreateUserDto): Promise<User | undefined> {
+        const user = new User();
+        user.email = createUserDto.email;
+        user.username = createUserDto.username;
+        user.password = createUserDto.password;
+        user.type = UserTypeEnum.USER;
+        user.dateCreated = new Date();
+        user.dateUpdated = new Date();
+        return this.userRepo.save(user);
     }
 }

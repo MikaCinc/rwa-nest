@@ -6,13 +6,13 @@ export class User {
     @PrimaryGeneratedColumn()
     public id!: number;
 
-    @Column({ type: 'text', nullable: false })
+    @Column({ type: 'text', nullable: false, unique: true })
     public username!: string;
 
     @Column({ type: 'text', nullable: false })
     public password!: string;
 
-    @Column({ type: 'text', nullable: false })
+    @Column({ type: 'text', nullable: false, unique: true })
     public email!: string;
 
     @Column({ type: 'text', nullable: false, default: UserTypeEnum.USER })
