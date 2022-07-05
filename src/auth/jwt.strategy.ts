@@ -16,15 +16,13 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     }
 
     async validate(payload: any) {
-        console.log('payload', payload);
-
         let userFromDB = await this.usersService.findOne(payload.username);
-        console.log('userFromDB', userFromDB);
 
         return {
             id: userFromDB.id,
             username: payload.username,
             email: userFromDB.email,
+            type: userFromDB.type,
             dateCreated: userFromDB.dateCreated,
             dateUpdated: userFromDB.dateUpdated
         };

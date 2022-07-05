@@ -18,7 +18,7 @@ export class AuthController {
             success: false,
             data: null
         };
-
+        
         try {
             let loginResult: IUserToken = await this.authService.login(req.user);
             response.success = true;

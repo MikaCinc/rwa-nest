@@ -1,3 +1,4 @@
+import { UserTypeEnum } from "src/enums";
 import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
 
 @Entity({ name: 'user' })
@@ -13,6 +14,9 @@ export class User {
 
     @Column({ type: 'text', nullable: false })
     public email!: string;
+
+    @Column({ type: 'text', nullable: false, default: UserTypeEnum.USER })
+    public type!: string;
 
     @Column({ type: 'timestamptz', nullable: true, default: () => "CURRENT_TIMESTAMP" })
     public dateCreated!: Date;

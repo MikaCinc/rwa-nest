@@ -1,9 +1,11 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Request } from '@nestjs/common';
 import { PitanjeService } from './pitanje.service';
 import { CreatePitanjeDto } from './dto/create-pitanje.dto';
 import { UpdatePitanjeDto } from './dto/update-pitanje.dto';
 import { IPitanje, ServerResponse } from 'src/interfaces';
 import { Pitanje } from './entities/pitanje.entity';
+import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
+import { UserTypeEnum } from 'src/enums';
 
 @Controller('pitanje')
 export class PitanjeController {
@@ -99,14 +101,20 @@ export class PitanjeController {
     return response;
   }
 
+  @UseGuards(JwtAuthGuard)
   @Delete(':id')
-  async remove(@Param('id') id: string) {
+  async remove(@Request() req, @Param('id') id: string) {
     let response: ServerResponse<boolean> = {
       success: false,
       data: null
     };
 
     try {
+      const { user } = req;
+      if (!user || user.type !== UserTypeEnum.ADMIN) {
+        throw new Error('You are not authorized to perform this action');
+      }
+
       let deleteResult: boolean = await this.pitanjeService.remove(+id);
       response.success = true;
       response.data = deleteResult;

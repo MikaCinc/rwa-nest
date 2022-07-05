@@ -22,9 +22,7 @@ export class UsersService {
 
     async findOne(username: string): Promise<User | undefined> {
         // return this.users.find(user => user.username === username);
-
         let user = await this.userRepo.findOneBy({ username });
-        console.log("findOne", user);
 
         if (!user || !user.id) {
             throw new Error('User with that USERNAME not found');
