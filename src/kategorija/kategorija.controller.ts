@@ -1,9 +1,11 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Request } from '@nestjs/common';
 import { KategorijaService } from './kategorija.service';
 import { CreateKategorijaDto } from './dto/create-kategorija.dto';
 import { UpdateKategorijaDto } from './dto/update-kategorija.dto';
 import { ServerResponse } from 'src/interfaces';
 import { Kategorija } from './entities/kategorija.entity';
+import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
+import { UserTypeEnum } from 'src/enums';
 
 @Controller('kategorija')
 export class KategorijaController {
@@ -81,14 +83,20 @@ export class KategorijaController {
     return response;
   }
 
+  @UseGuards(JwtAuthGuard)
   @Delete(':id')
-  async remove(@Param('id') id: string) {
+  async remove(@Request() req, @Param('id') id: string) {
     let response: ServerResponse<boolean> = {
       success: false,
       data: null
     };
 
     try {
+      const { user } = req;
+      if (!user || user.type !== UserTypeEnum.ADMIN) {
+        throw new Error('You are not authorized to perform this action');
+      }
+
       let deleteResult: boolean = await this.kategorijaService.remove(+id);
       response.success = true;
       response.data = deleteResult;
