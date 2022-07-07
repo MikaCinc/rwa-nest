@@ -4,7 +4,8 @@ import { UpdatePitanjeDto } from './dto/update-pitanje.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { DeleteResult, InsertResult, Repository } from 'typeorm';
 import { Pitanje } from './entities/pitanje.entity';
-import { getAllQuestionsByCategory, insertTestTagsQuery, selectAllCategoryIDsViaPitanjeID, deleteAllCategoriesQuery, getAllQuestionsWithCategories } from './pitanje.queries';
+import { getAllQuestionsByCategory, insertQuestionCategoryQuery, selectAllCategoryIDsViaPitanjeID, deleteAllCategoriesQuery, getAllQuestionsWithCategories } from './pitanje.queries';
+import { QuestionTypeEnum } from 'src/enums';
 
 type KategorijaId = { id: number }
 
@@ -17,14 +18,16 @@ export class PitanjeService {
   async create(createPitanjeDto: CreatePitanjeDto) {
     let finalPitanje = new Pitanje();
     finalPitanje.text = createPitanjeDto.text;
-    finalPitanje.isCorrect = createPitanjeDto.isCorrect;
+    finalPitanje.isCorrect = createPitanjeDto.isCorrect || false;
+    finalPitanje.type = createPitanjeDto.type || QuestionTypeEnum.BOOL;
+    finalPitanje.answer = createPitanjeDto.answer || '';
     finalPitanje.dateCreated = new Date();
     finalPitanje.dateUpdated = new Date();
     finalPitanje.categories = [];
     let result = await this.pitRepository.save(finalPitanje);
     let finalPitanjeCategories: number[] = [];
     if (createPitanjeDto.categories && createPitanjeDto.categories.length > 0) {
-      let ubaceneKategorije: InsertResult = await this.pitRepository.query(insertTestTagsQuery, [result.id, createPitanjeDto.categories]);
+      let ubaceneKategorije: InsertResult = await this.pitRepository.query(insertQuestionCategoryQuery, [result.id, createPitanjeDto.categories]);
       let fetchedCategoriesAfterChange: any[] = await this.pitRepository.query(selectAllCategoryIDsViaPitanjeID, [result.id]);
       finalPitanjeCategories = fetchedCategoriesAfterChange.map((tagId: KategorijaId) => tagId.id);
       console.log(result, finalPitanjeCategories);
@@ -68,14 +71,20 @@ export class PitanjeService {
     if (!pitanje || !pitanje.id) {
       throw new Error('Pitanje with that ID not found');
     }
-    const { text, isCorrect } = updatePitanjeDto;
+    const { text, isCorrect, type, answer } = updatePitanjeDto;
     console.log(updatePitanjeDto);
 
     if (!text) {
       throw new Error('Ime kategorije je obavezno');
     }
     pitanje.text = text;
-    pitanje.isCorrect = isCorrect;
+    pitanje.type = type;
+    if (isCorrect) {
+      pitanje.isCorrect = isCorrect;
+    }
+    if (answer) {
+      pitanje.answer = answer;
+    }
     pitanje.dateUpdated = new Date();
     let result: Pitanje = await this.pitRepository.save(pitanje);
 
@@ -86,7 +95,7 @@ export class PitanjeService {
     deleteResult = await this.pitRepository.query(deleteAllCategoriesQuery, [result.id]);
     if (updatePitanjeDto.categories && updatePitanjeDto.categories.length > 0) {
       // ubacujemo nove kategorije
-      insertResult = await this.pitRepository.query(insertTestTagsQuery, [result.id, updatePitanjeDto.categories]);
+      insertResult = await this.pitRepository.query(insertQuestionCategoryQuery, [result.id, updatePitanjeDto.categories]);
     }
 
     let fetchedCategoriesAfterChange: any[] = await this.pitRepository.query(selectAllCategoryIDsViaPitanjeID, [result.id]);

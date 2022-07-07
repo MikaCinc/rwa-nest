@@ -2,6 +2,8 @@ const getAllQuestionsWithCategories: string = `
     SELECT
     pitanje.id,
     pitanje.text,
+    pitanje.type,
+    pitanje.answer,
     pitanje."isCorrect",
     pitanje."dateCreated",
     pitanje."dateUpdated",
@@ -14,6 +16,8 @@ SELECT * FROM (
     SELECT
     pitanje.id,
     pitanje.text,
+    pitanje.type,
+    pitanje.answer,
     pitanje."isCorrect",
     pitanje."dateCreated",
     pitanje."dateUpdated",
@@ -23,7 +27,7 @@ SELECT * FROM (
 ) AS "pitanjeWrapper"
 WHERE "pitanjeWrapper"."categories" @> COALESCE($1::integer[]);`;
 
-const insertTestTagsQuery: string = `
+const insertQuestionCategoryQuery: string = `
     INSERT INTO "pitanjeKategorije" ("pitanjeId", "kategorijaId")
     SELECT $1, UNNEST(
         ARRAY(
@@ -44,7 +48,7 @@ const deleteAllCategoriesQuery: string = `
 export {
     getAllQuestionsWithCategories,
     getAllQuestionsByCategory,
-    insertTestTagsQuery,
+    insertQuestionCategoryQuery,
     selectAllCategoryIDsViaPitanjeID,
     deleteAllCategoriesQuery
 }

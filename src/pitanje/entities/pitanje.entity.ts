@@ -1,4 +1,5 @@
 
+import { QuestionTypeEnum } from 'src/enums';
 import { Kategorija } from 'src/kategorija/entities/kategorija.entity';
 import { Entity, Column, PrimaryGeneratedColumn, ManyToMany, JoinTable } from 'typeorm';
 
@@ -16,7 +17,13 @@ export class Pitanje {
     @Column({ type: 'text', nullable: false })
     public text!: string;
 
-    @Column({ default: true, nullable: false, })
+    @Column({ type: 'text', nullable: false, default: QuestionTypeEnum.BOOL })
+    public type!: QuestionTypeEnum;
+
+    @Column({ type: 'text', nullable: false, default: '' })
+    public answer!: string;
+
+    @Column({ type: 'boolean', default: true, nullable: false })
     isCorrect: boolean;
 
     // vise pitanja mogu imati vise kategorija
