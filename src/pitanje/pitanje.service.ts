@@ -4,7 +4,7 @@ import { UpdatePitanjeDto } from './dto/update-pitanje.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { DeleteResult, InsertResult, Repository } from 'typeorm';
 import { Pitanje } from './entities/pitanje.entity';
-import { getAllQuestionsByCategory, insertQuestionCategoryQuery, selectAllCategoryIDsViaPitanjeID, deleteAllCategoriesQuery, getAllQuestionsWithCategories } from './pitanje.queries';
+import { getAllQuestionsByCategory, insertQuestionCategoryQuery, selectAllCategoryIDsViaPitanjeID, deleteAllCategoriesQuery, getAllQuestionsWithCategories, getAllFeaturedQuestions } from './pitanje.queries';
 import { QuestionTypeEnum } from 'src/enums';
 
 type KategorijaId = { id: number }
@@ -40,6 +40,11 @@ export class PitanjeService {
 
   async findAll() {
     let pitanja = await this.pitRepository.query(getAllQuestionsWithCategories);
+    return pitanja;
+  }
+
+  async findFeatured() {
+    let pitanja = await this.pitRepository.query(getAllFeaturedQuestions);
     return pitanja;
   }
 
@@ -112,5 +117,11 @@ export class PitanjeService {
     let result: DeleteResult = await this.pitRepository.delete(id);
     return !!result.affected;
   }
-}
 
+  async toggleFeatured(id: number) {
+    let pitanje = await this.pitRepository.findOneBy({ id });
+    pitanje.isFeatured = !pitanje.isFeatured;
+    let result: Pitanje = await this.pitRepository.save(pitanje);
+    return result;
+  }
+}

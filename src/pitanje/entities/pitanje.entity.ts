@@ -26,6 +26,9 @@ export class Pitanje {
     @Column({ type: 'boolean', default: true, nullable: false })
     isCorrect: boolean;
 
+    @Column({ type: 'boolean', default: false, nullable: false })
+    isFeatured: boolean;
+
     // vise pitanja mogu imati vise kategorija
     @ManyToMany(() => Kategorija, (kategorija: Kategorija) => kategorija.pitanja)
     @JoinTable({ name: 'pitanjeKategorije' })

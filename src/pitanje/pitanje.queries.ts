@@ -5,6 +5,7 @@ const getAllQuestionsWithCategories: string = `
     pitanje.type,
     pitanje.answer,
     pitanje."isCorrect",
+    pitanje."isFeatured",
     pitanje."dateCreated",
     pitanje."dateUpdated",
     (SELECT ARRAY(SELECT "kategorijaId" FROM "pitanjeKategorije" WHERE "pitanjeKategorije"."pitanjeId" = "pitanje"."id")) AS "categories"
@@ -19,6 +20,7 @@ SELECT * FROM (
     pitanje.type,
     pitanje.answer,
     pitanje."isCorrect",
+    pitanje."isFeatured",
     pitanje."dateCreated",
     pitanje."dateUpdated",
     (SELECT ARRAY(SELECT "kategorijaId" FROM "pitanjeKategorije" WHERE "pitanjeKategorije"."pitanjeId" = "pitanje"."id")) AS "categories"
@@ -26,6 +28,23 @@ SELECT * FROM (
     FROM pitanje
 ) AS "pitanjeWrapper"
 WHERE "pitanjeWrapper"."categories" @> COALESCE($1::integer[]);`;
+
+const getAllFeaturedQuestions: string = `
+SELECT * FROM (
+    SELECT
+    pitanje.id,
+    pitanje.text,
+    pitanje.type,
+    pitanje.answer,
+    pitanje."isCorrect",
+    pitanje."isFeatured",
+    pitanje."dateCreated",
+    pitanje."dateUpdated",
+    (SELECT ARRAY(SELECT "kategorijaId" FROM "pitanjeKategorije" WHERE "pitanjeKategorije"."pitanjeId" = "pitanje"."id")) AS "categories"
+
+    FROM pitanje
+) AS "pitanjeWrapper"
+WHERE "pitanjeWrapper"."isFeatured" = TRUE;`;
 
 const insertQuestionCategoryQuery: string = `
     INSERT INTO "pitanjeKategorije" ("pitanjeId", "kategorijaId")
@@ -47,6 +66,7 @@ const deleteAllCategoriesQuery: string = `
 
 export {
     getAllQuestionsWithCategories,
+    getAllFeaturedQuestions,
     getAllQuestionsByCategory,
     insertQuestionCategoryQuery,
     selectAllCategoryIDsViaPitanjeID,

@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Request } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Request, ParseIntPipe } from '@nestjs/common';
 import { PitanjeService } from './pitanje.service';
 import { CreatePitanjeDto } from './dto/create-pitanje.dto';
 import { UpdatePitanjeDto } from './dto/update-pitanje.dto';
@@ -38,6 +38,24 @@ export class PitanjeController {
 
     try {
       let pitanja: IPitanje[] = await this.pitanjeService.findAll();
+      response.success = true;
+      response.data = pitanja;
+    } catch (err) {
+      response.message = err.message;
+    }
+
+    return response;
+  }
+
+  @Get('/featured')
+  async findFeatured() {
+    let response: ServerResponse<IPitanje[]> = {
+      success: false,
+      data: null
+    };
+
+    try {
+      let pitanja: IPitanje[] = await this.pitanjeService.findFeatured();
       response.success = true;
       response.data = pitanja;
     } catch (err) {
@@ -118,6 +136,29 @@ export class PitanjeController {
       let deleteResult: boolean = await this.pitanjeService.remove(+id);
       response.success = true;
       response.data = deleteResult;
+    } catch (err) {
+      response.message = err.message;
+    }
+
+    return response;
+  }
+
+  // toggle za featured preko ID
+  @UseGuards(JwtAuthGuard)
+  @Get(':id/toggleFeatured')
+  public async toggleFeatured(
+    @Param('id', ParseIntPipe) id: number,
+  ): Promise<ServerResponse<Pitanje>> {
+
+    let response: ServerResponse<Pitanje> = {
+      success: false,
+      data: null
+    };
+
+    try {
+      let result: Pitanje = await this.pitanjeService.toggleFeatured(id);
+      response.success = true;
+      response.data = result;
     } catch (err) {
       response.message = err.message;
     }
