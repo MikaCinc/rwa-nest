@@ -28,16 +28,27 @@ export class UsersService {
 
     async findOne(username: string): Promise<User | undefined> {
         // return this.users.find(user => user.username === username);
-        let user = await this.userRepo.findOne({
+        let user: User = await this.userRepo.findOne({
             where: { username },
-            relations: ['favourites']
+            relations: ['favourites', 'favourites.categories'],
         });
 
         if (!user || !user.id) {
             throw new Error('User with that USERNAME not found');
         }
 
-        return user;
+        let userToReturn: any = {
+            ...user,
+            favourites: user.favourites.map(favourite => ({
+                ...favourite,
+                categories: favourite.categories.map(category => category.id)
+            })),
+        }
+        /* user.favourites.forEach(fav => {
+            fav.categories = fav.categories.map(cat => cat.id);
+        }) */
+
+        return userToReturn;
     }
 
     createUser(createUserDto: CreateUserDto): Promise<User | undefined> {
@@ -55,7 +66,7 @@ export class UsersService {
     async toggleFavourite(id: number, userId: number): Promise<User> {
         let user = await this.userRepo.findOne({
             where: { id: userId },
-            relations: ['favourites']
+            relations: ['favourites', 'favourites.categories']
         });
 
         if (!user || !user.id) {
@@ -64,9 +75,11 @@ export class UsersService {
         const isCurrentlyFavourite = !!user.favourites.find(favourite => favourite.id === id);
         let pitanje;
         if (!isCurrentlyFavourite) {
-            pitanje = await this.pitRepo.findOneBy({ id });
+            pitanje = await this.pitRepo.findOne({
+                where: { id },
+                relations: ['categories']
+            });
         }
-        console.log('toggleFav', user, isCurrentlyFavourite, pitanje);
         const newFavourites = isCurrentlyFavourite
             ? user.favourites.filter(fav => fav.id !== id)
             : [...user.favourites, pitanje];
@@ -76,6 +89,15 @@ export class UsersService {
         /* const result = await this.userRepo.update(userId, { favourites: newFavourites });
         return !!result.affected; */
         const result = await this.userRepo.save(user);
-        return result;
+
+        let userToReturn: any = {
+            ...result,
+            favourites: user.favourites.map(favourite => ({
+                ...favourite,
+                categories: favourite.categories.map(category => category.id)
+            })),
+        }
+
+        return userToReturn;
     }
 }
