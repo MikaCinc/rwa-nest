@@ -1,6 +1,7 @@
 
 import { QuestionTypeEnum } from 'src/enums';
 import { Kategorija } from 'src/kategorija/entities/kategorija.entity';
+import { User } from 'src/users/entities/user.entity';
 import { Entity, Column, PrimaryGeneratedColumn, ManyToMany, JoinTable } from 'typeorm';
 
 @Entity()
@@ -33,4 +34,9 @@ export class Pitanje {
     @ManyToMany(() => Kategorija, (kategorija: Kategorija) => kategorija.pitanja)
     @JoinTable({ name: 'pitanjeKategorije' })
     public categories: Kategorija[];
+
+    // vise pitanja mogu imati vise kategorija
+    @ManyToMany(() => User, (user: User) => user.favourites)
+    @JoinTable({ name: 'pitanjaFavoriti' })
+    public users: User[];
 }

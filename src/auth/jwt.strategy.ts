@@ -23,6 +23,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
             username: payload.username,
             email: userFromDB.email,
             type: userFromDB.type,
+            favourites: userFromDB.favourites,
             dateCreated: userFromDB.dateCreated,
             dateUpdated: userFromDB.dateUpdated
         };
