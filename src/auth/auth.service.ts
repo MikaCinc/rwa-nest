@@ -24,7 +24,7 @@ export class AuthService {
         if (!isMatch) {
             throw new Error('Pogrešna lozinka.');
         }
-        return user;
+        return result;
     }
 
     async login(user: any) {
