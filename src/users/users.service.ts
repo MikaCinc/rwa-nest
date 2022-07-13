@@ -6,6 +6,7 @@ import { Pitanje } from 'src/pitanje/entities/pitanje.entity';
 import { Repository } from 'typeorm';
 import { CreateUserDto } from './dto/create-user-dto';
 import { User } from './entities/user.entity';
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class UsersService {
@@ -51,11 +52,29 @@ export class UsersService {
         return userToReturn;
     }
 
-    createUser(createUserDto: CreateUserDto): Promise<User | undefined> {
+    async createUser(createUserDto: CreateUserDto): Promise<User | undefined> {
+        const { email, username, password } = createUserDto;
+
+        if (!email || !username || !password) {
+            throw new Error('Missing required fields');
+        }
+
+        if (await this.userRepo.findOne({ where: { username } })) {
+            throw new Error('User with that USERNAME already exists');
+        }
+
+        if (await this.userRepo.findOne({ where: { email } })) {
+            throw new Error('User with that EMAIL already exists');
+        }
+
+        const saltRounds = 10;
+        const salt = await bcrypt.genSalt(saltRounds);
+        const hash = await bcrypt.hash(password, salt);
+
         const user = new User();
-        user.email = createUserDto.email;
-        user.username = createUserDto.username;
-        user.password = createUserDto.password;
+        user.email = email;
+        user.username = username;
+        user.password = hash;
         user.type = UserTypeEnum.USER;
         user.favourites = [];
         user.dateCreated = new Date();

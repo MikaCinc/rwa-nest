@@ -25,7 +25,7 @@ export class AuthController {
             response.success = true;
             response.data = loginResult;
         } catch (err) {
-            response.message = err.message;
+            response.message = err.message || "Problem sa /login rutom";
         }
 
         return response;
