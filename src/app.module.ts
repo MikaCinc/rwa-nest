@@ -5,20 +5,16 @@ import { PitanjeModule } from './pitanje/pitanje.module';
 import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { TypeOrmConfigService } from './typeorm/typeorm.service';
-import { getEnvPath } from './common/helpers/env.helper';
 import { KategorijaModule } from './kategorija/kategorija.module';
 import { DataSource } from 'typeorm';
 import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
 
-const envFilePath: string = getEnvPath(`${__dirname}/common/envs`);
-
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
-    /* ConfigModule.forRoot({ envFilePath, isGlobal: true }), */
     TypeOrmModule.forRootAsync({
-      useClass: TypeOrmConfigService, 
+      useClass: TypeOrmConfigService,
       // dataSource receives the configured DataSourceOptions
       // and returns a Promise<DataSource>.
       /* dataSourceFactory: async (options) => {
