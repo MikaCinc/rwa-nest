@@ -5,6 +5,11 @@ import { Injectable } from '@nestjs/common';
 import { jwtConstants } from './constants';
 import { UsersService } from 'src/users/users.service';
 
+interface IPayload {
+    sub: number;
+    username: string;
+}
+
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
     constructor(private usersService: UsersService) {
@@ -15,7 +20,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
         });
     }
 
-    async validate(payload: any) {
+    async validate(payload: IPayload) {
         let userFromDB = await this.usersService.findOne(payload.username);
 
         return {
